@@ -1,47 +1,5 @@
 # forked from https://github.com/eleanorstrib/parse_dialog/blob/master/code.py
 
-"""
-
-Questions:
-
-Where are we?
-Where are we going?
-Who am I?
-Who are you?
-Why are we here?
-What is the future?
-What is our future?
-What is my future?
-Does God exist?
-What is your first memory?
-What is my first memory?
-How did it all begin?
-What is a galaxy?
-Is there life on other planets?
-Why do we love dogs?
-Do you love cats?
-Will I be lucky?
-Will I be healthy?
-Will we make it?
-When is all this gonna stop?
-How long will we survive?
-Where will we go?
-Who is the first american president?
-What day are we in?
-Who is our president?
-What should I eat?
-Do you like to drink?
-What is your favourite drink?
-What is your favourite palace?
-What is your favourite position?
-When will I die?
-How is this gonna end?
-Who will be the next president?
-When is COVID going to be stopped?
-When will the next virus come?
-
-"""
-
 from nltk import word_tokenize
 
 

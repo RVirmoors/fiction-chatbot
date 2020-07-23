@@ -902,13 +902,12 @@ def main():
         question = input('YOU:')
 
         nlp = pipeline('question-answering')
-        nlp({
+        q = nlp({
             'question': question,
             'context': 'I am here.'
         })
 
-        answer = model(question)
-        print('ME:', answer)
+        print('ME:', q['answer'])
 
     return results
 
