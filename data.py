@@ -1,6 +1,7 @@
-# forked from https://github.com/eleanorstrib/parse_dialog/blob/master/code.py
+# inspired by https://github.com/eleanorstrib/parse_dialog/blob/master/code.py
 
 from nltk import word_tokenize
+from nltk.tokenize.treebank import TreebankWordDetokenizer
 
 
 def step_one_read_in(textfile):
@@ -11,70 +12,68 @@ def step_one_read_in(textfile):
     return text
 
 
-def step_two_tokenize_text(text):
-    tokenized = word_tokenize(text)
-    return tokenized
-
-
-def step_four_parse_text(tokenized):
-    # let's set up some lists to hold our pieces of narrative and dialog
+def read_and_parse(textfile):
     parsed_dialog = []
     parsed_narrative = []
-    # and this list will be a bucket for the text we're currently exploring
-    current = []
-
-    # now let's set up values that will help us loop through the text
-    length = len(tokenized)
-    found_q = False
-    counter = 0
-    quote_open, quote_close = "''", "''"
-
-    # now we'll start our loop saying that as long as our sentence is...
-    while counter < length:
-        word = tokenized[counter]
-
-        # until we find a quotation mark, we're working with narrative
-        if quote_open not in word and quote_close not in word:
-            current.append(word)
-
-        # here's what we do when we find a closed quote
-        else:
-            # we append the narrative we've collected & clear our our
-            # current variable
-            parsed_narrative.append(current)
+    bunch_dialog = []       # 50 lines at a time
+    bunch_narrative = []    # 50 lines at a time
+    # current text (can be dialog or narrative)
+    quote_open, quote_close = '``', "''"
+    with open(textfile, 'rt', encoding="utf8") as file_in:
+        for line in file_in:
+            quotes = []
             current = []
-            # now current is ready to hold dialog and we're working on
-            # a piece of dialog
-            current.append(word)
-            found_q = True
-
-            # while we're in the quote, we're going to increment the counter
-            # and append to current in this while loop
-            while found_q and counter < length - 1:
-                counter += 1
-                if quote_close not in tokenized[counter]:
-                    current.append(tokenized[counter])
-                else:
-                    # if we find a closing quote, we add our dialog to the
-                    # appropriate list, clear current and flip our found_q
-                    # variable to False
-                    current.append(tokenized[counter])
-                    parsed_dialog.append(current)
+            cont_narr = False
+            tokenized = word_tokenize(line)
+            counter = 0
+            while counter < len(tokenized):
+                word = tokenized[counter]
+                if quotes and quote_close in word:
+                    quotes.pop()
+                    if len(current) > 3:  # long quote = dialog
+                        parsed_dialog.append(current)
+                        if len(parsed_dialog) >= 50:
+                            bunch_dialog.append(parsed_dialog)
+                            parsed_dialog = []
+                    elif parsed_narrative:   # short quote = narrative
+                        parsed_narrative[-1] += current
+                        cont_narr = True
                     current = []
-                    found_q = False
+                elif quote_open in word:
+                    quotes.append(quote_open)     # starting quote
+                    if len(current) > 3:
+                        if cont_narr:
+                            parsed_narrative[-1] += current
+                            cont_narr = False
+                        else:
+                            parsed_narrative.append(current)
+                        if len(parsed_narrative) >= 50:
+                            bunch_narrative.append(parsed_narrative)
+                            parsed_narrative = []
+                            cont_narr = False
+                    current = []
+                else:
+                    current.append(word)
+                counter += 1
+    return bunch_dialog, bunch_narrative
 
-        # increment the counter to move us through the text
-        counter += 1
 
-    return (parsed_dialog, parsed_narrative)
+def write_data(bunch, name):
+    for i in range(len(bunch)):
+        text = ''
+        for line in range(len(bunch[i])):
+            detok = TreebankWordDetokenizer().detokenize(bunch[i][line])
+            text += detok + '\n'
+        filename = 'data/' + name + '-' + '{:2d}'.format(i) + '.txt'
+        with open(filename, 'w', encoding="utf8") as file_out:
+            file_out.write(text)
+            file_out.close()
 
 
 if __name__ == "__main__":
-    text = step_one_read_in('data/exegesis.txt')
-    print(text[:10])
-    tokenized = step_two_tokenize_text(text)
-    print(tokenized[:10])
-    parsed_dialog, parsed_narrative = step_four_parse_text(tokenized)
-    print("Here is the dialog", parsed_dialog[1])
-    print("*" * 100)
-    print("Here is the narrative",  parsed_narrative[1])
+    #text = step_one_read_in('text1.txt')
+    for i in range(2):
+        dialog, narrative = read_and_parse('text' + str(i + 1) + '.txt')
+        print('Writing text #', i + 1)
+        write_data(dialog, 'dial-' + str(i))
+        write_data(narrative, 'narr-' + str(i))
