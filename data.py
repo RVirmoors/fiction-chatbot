@@ -70,10 +70,19 @@ def write_data(bunch, name):
             file_out.close()
 
 
+def write_persona(bunch):
+    print(dialog[0])
+    persona = []
+    return persona
+
+
 if __name__ == "__main__":
     #text = step_one_read_in('text1.txt')
     for i in range(2):
         dialog, narrative = read_and_parse('text' + str(i + 1) + '.txt')
+        persona = write_persona(dialog)
+        """
         print('Writing text #', i + 1)
         write_data(dialog, 'dial-' + str(i))
         write_data(narrative, 'narr-' + str(i))
+        """
