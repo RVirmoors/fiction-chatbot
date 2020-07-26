@@ -1,19 +1,26 @@
+import tensorflow as tf
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.Session(config=config)
+
+
 from deeppavlov import configs
 from deeppavlov.core.common.file import read_json
-from deeppavlov import configs, train_model
-
-model_config = read_json(configs.doc_retrieval.en_ranker_tfidf_wiki)
-model_config["dataset_reader"]["data_path"] = "data"
-model_config["dataset_reader"]["dataset_format"] = "txt"
-ranker = train_model(model_config)
-
+from deeppavlov import train_model
 from deeppavlov.core.commands.infer import build_model
 
+model_config = read_json('en_ranker_tfidf_data.json')
+ranker = train_model(model_config)
+
+print('==========RANKER======', ranker(['accidents']))
+
+
+
 # Download all the SQuAD models
-squad = build_model(configs.squad.multi_squad_noans_infer, download = True)
+# squad = build_model(configs.squad.multi_squad_noans_infer, download = True)
 
 # Do not download the ODQA models, we've just trained it
-odqa = build_model(configs.odqa.en_odqa_infer_wiki, download = False)
+odqa = build_model('en_odqa_infer_data.json', download = False)
 
 val_q = "What causes accidents?"
 answer1 = odqa([val_q]) #  provide answer based on trained data 
