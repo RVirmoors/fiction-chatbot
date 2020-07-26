@@ -22,7 +22,7 @@ print('==========RANKER======', ranker(['accidents']))
 # Do not download the ODQA models, we've just trained it
 odqa = build_model('en_odqa_infer_data.json', download = False)
 
-val_q = "What causes accidents?"
+val_q = "Do you like people?"
 answer1 = odqa([val_q]) #  provide answer based on trained data 
 
 print(answer1)
