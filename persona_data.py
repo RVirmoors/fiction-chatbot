@@ -137,7 +137,6 @@ def read_and_parse(textfile):
             candidates.append(preprocess(question['a']))
             persona["utterances"].append(
                 {"candidates": candidates, "history": history})
-        print("Built persona.")
     return persona
 
 
@@ -153,13 +152,16 @@ def write_data(bunch, name):
             file_out.close()
 
 
-def write_persona(persona, filename):
+def write_persona(personas, filename):
     with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(persona, f, ensure_ascii=False, indent=4)
+        json.dump(personas, f, ensure_ascii=False, indent=4)
     print(filename, "written.")
 
 
 if __name__ == "__main__":
+    personas = []
     for i in range(args.files):
-        persona = read_and_parse('text' + str(i + 1) + '.txt')
-        write_persona(persona, 'data/data' + str(i + 1) + '.json')
+        new_pers = read_and_parse('text' + str(i + 1) + '.txt')
+        print("Built persona", i + 1)
+        personas.append(new_pers)
+    write_persona(personas, 'data.json')
