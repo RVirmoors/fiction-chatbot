@@ -72,8 +72,32 @@ def get_data_loaders(args, tokenizer):
     """ Prepare the dataset for training and evaluation """
     personachat = get_dataset(tokenizer, args.dataset_path, args.dataset_cache)
 
+    if not isinstance(personachat, dict):   # dataset not split into train, valid yet
+    # for some reason this part wasn't needed locally, but is needed on Google Colab. Needs more testing...
+        nb_utterances = len(personachat[0]["utterances"])
+        nb_train = int(nb_utterances * 0.8)
+        nb_val = nb_utterances - nb_train
+
+        train = {
+            "personality": personachat[0]["personality"],
+            "utterances": []
+        }
+        valid = {
+            "personality": personachat[0]["personality"],
+            "utterances": []
+        }
+
+        for i, utterance in enumerate(personachat[0]["utterances"]):
+            if i < nb_train:
+                train["utterances"].append(utterance)
+            else:
+                valid["utterances"].append(utterance)
+
+        personachat = {"train": [train], "valid": [valid]}
+
     logger.info("Build inputs and labels")
     datasets = {"train": defaultdict(list), "valid": defaultdict(list)}
+
     for dataset_name, dataset in personachat.items():
         num_candidates = len(dataset[0]["utterances"][0]["candidates"])
         if args.num_candidates > 0 and dataset_name == 'train':
