@@ -1,5 +1,9 @@
 # inspired by https://github.com/eleanorstrib/parse_dialog/blob/master/code.py
 
+import argparse
+import queue
+import sys
+
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
@@ -7,6 +11,17 @@ import random
 import re
 
 import json
+
+# parse command line args
+parser = argparse.ArgumentParser(
+    description=__doc__,
+    formatter_class=argparse.RawDescriptionHelpFormatter
+)  # show docstring from top
+
+parser.add_argument(
+    '--files', type=int, default=2,
+    help='# of text files to process.')
+args = parser.parse_args()
 
 
 def step_one_read_in(textfile):
@@ -145,12 +160,6 @@ def write_persona(persona, filename):
 
 
 if __name__ == "__main__":
-    # text = step_one_read_in('text1.txt')
-    for i in range(2):
+    for i in range(args.files):
         persona = read_and_parse('text' + str(i + 1) + '.txt')
-        write_persona(persona, 'data' + str(i + 1) + '.json')
-        """
-        print('Writing text #', i + 1)
-        write_data(dialog, 'dial-' + str(i))
-        write_data(narrative, 'narr-' + str(i))
-        """
+        write_persona(persona, 'data/data' + str(i + 1) + '.json')
