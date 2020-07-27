@@ -1,4 +1,17 @@
-transfer-learning-conv-ai/
+transfer-learning-conv-ai/model
+transfer-learning-conv-ai/.vscode
+transfer-learning-conv-ai/experiments/
+transfer-learning-conv-ai/data/
+transfer-learning-conv-ai/dataset_cache*
+transfer-learning-conv-ai/runs/
+transfer-learning-conv-ai/ParlAI/
+transfer-learning-conv-ai/__pycache__
+transfer-learning-conv-ai/.env/
+transfer-learning-conv-ai/runs/
+transfer-learning-conv-ai/.DS_Store
+transfer-learning-conv-ai/gpt_personachat_cache_v2/
+*dataset_cache*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
