@@ -3,6 +3,11 @@
 from nltk import word_tokenize
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
+import random
+import re
+
+import json
+
 
 def step_one_read_in(textfile):
     text = ''
@@ -12,13 +17,18 @@ def step_one_read_in(textfile):
     return text
 
 
-def preprocess(string):
+def preprocess(tokenized):
     """
     Preprocessing:
+    - detokenize
     - Spaces before periods at end of sentences
     - everything lowercase
     """
-    return string
+    s = TreebankWordDetokenizer().detokenize(tokenized)
+    s = re.sub('([.,!?()])', r' \1 ', s)
+    s = re.sub('\s{2,}', ' ', s)
+    s = s.lower()
+    return s
 
 
 def read_and_parse(textfile):
@@ -26,12 +36,7 @@ def read_and_parse(textfile):
         "personality": ["exegesis .", "the female man ."],
         "utterances": []
     }
-    persona["utterances"].append({
-        "candidates": ["yes ."],
-        "history": ["is there a god ?"]
-    })
 
-    parsed_dialog = []
     parsed_narrative = []
 
     questions = []  # list of Q & A pairs
@@ -39,7 +44,7 @@ def read_and_parse(textfile):
 
     quote_open, quote_close = '``', "''"
     with open(textfile, 'rt', encoding="utf8") as file_in:
-        open_q = False
+        open_q = open_qq = False
         for line in file_in:
             quotes = []
             current = []
@@ -54,14 +59,14 @@ def read_and_parse(textfile):
                     if current[-1] == ',':
                         cont_diag += current
                     elif len(current) > 2:    # long quote = dialog
-                        if open_q:
+                        if open_qq:
                             questions[-1]['a'] = cont_diag + current
-                            open_q = False
+                            open_qq = False
                         if current[-1] == '?':
                             questions.append(
                                 {'q': (cont_diag + current), 'a': []})
-                            open_q = True
-                        else:
+                            open_qq = True
+                        elif current[-1] not in ":;-—*":
                             answers.append(cont_diag + current)
                         cont_diag = []
                     elif parsed_narrative and not cont_diag:   # short quote = narrative
@@ -77,33 +82,47 @@ def read_and_parse(textfile):
                         else:
                             parsed_narrative.append(current)
                             cont_narr = False
-                        if open_q and current[-1] in '.!':
+                            """
+                        if open_qq:
                             questions[-1]['a'] = parsed_narrative[-1]
-                            open_q = False
+                            open_qq = False
+                            """
                         if current[-1] == '?':
                             questions.append(
                                 {'q': parsed_narrative[-1], 'a': []})
-                            open_q = True
-                        else:
-                            answers.append(parsed_narrative[-1])
+                            open_qq = True
                     current = []
                 else:
                     current.append(word)
                 counter += 1
                 if current and not quotes:
-                    if open_q and current[-1] in '.!':
-                        questions[-1]['a'] = current
+                    # regular text, outside quotes
+                    if current[-1] in ".!":
+                        if open_q:
+                            questions[-1]['a'] = current
+                            open_q = False
+                        else:
+                            answers.append(current)
                         current = []
-                        open_q = False
                     elif current[-1] == '?':
+                        if open_q:
+                            questions[-1]['a'] = current
                         questions.append(
                             {'q': current, 'a': []})
-                        open_q = True
+                        open_q = open_qq = True
                         current = []
-            if current:
+            if current and current[-1] not in ":;-—*":
                 # end of paragraph:
                 answers.append(current)
-    print(questions[15:20])
+
+        for _, question in enumerate(questions):
+            history = [preprocess(question['q'])]
+            candidates = [preprocess(item)
+                          for item in random.sample(answers,  10)]
+            candidates.append(preprocess(question['a']))
+            persona["utterances"].append(
+                {"candidates": candidates, "history": history})
+        print("Built persona.")
     return persona
 
 
@@ -119,16 +138,17 @@ def write_data(bunch, name):
             file_out.close()
 
 
-def write_persona(persona):
-    print(persona)
-    return persona
+def write_persona(persona, filename):
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(persona, f, ensure_ascii=False, indent=4)
+    print(filename, "written.")
 
 
 if __name__ == "__main__":
-    #text = step_one_read_in('text1.txt')
-    for i in range(1):
+    # text = step_one_read_in('text1.txt')
+    for i in range(2):
         persona = read_and_parse('text' + str(i + 1) + '.txt')
-        # write_persona(persona)
+        write_persona(persona, 'data' + str(i + 1) + '.json')
         """
         print('Writing text #', i + 1)
         write_data(dialog, 'dial-' + str(i))
