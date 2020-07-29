@@ -583,7 +583,7 @@ def main(df_trn, df_val):
         tokenizer.save_pretrained(args.output_dir)
 
         # Good practice: save your training arguments together with the trained model
-        torch.save(args, os.path.join(args.output_dir, "training_args.bin"))
+        #torch.save(args, os.path.join(args.output_dir, "training_args.bin"))
 
         # Load a trained model and vocabulary that you have fine-tuned
         model = AutoModelWithLMHead.from_pretrained(args.output_dir)
