@@ -65,8 +65,8 @@ class Args():
         self.do_train = True
         self.do_eval = True
         self.evaluate_during_training = False
-        self.per_gpu_train_batch_size = 4
-        self.per_gpu_eval_batch_size = 4
+        self.per_gpu_train_batch_size = 2
+        self.per_gpu_eval_batch_size = 2
         self.gradient_accumulation_steps = 1
         self.learning_rate = 5e-5
         self.weight_decay = 0.0
@@ -409,8 +409,8 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                     model_to_save.save_pretrained(output_dir)
                     tokenizer.save_pretrained(output_dir)
 
-                    torch.save(args, os.path.join(
-                        output_dir, "training_args.bin"))
+                    #torch.save(args, os.path.join(
+                    #    output_dir, "training_args.bin"))
                     logger.info("Saving model checkpoint to %s", output_dir)
 
                     _rotate_checkpoints(args, checkpoint_prefix)
@@ -497,13 +497,15 @@ def evaluate(args, model: PreTrainedModel, tokenizer: PreTrainedTokenizer, df_tr
 
 # Main runner
 
+
 def main(df_trn, df_val):
     args = Args()
 
     if args.should_continue:
         sorted_checkpoints = _sorted_checkpoints(args)
         if len(sorted_checkpoints) == 0:
-            raise ValueError("Used --should_continue but no checkpoint was found in --output_dir.")
+            raise ValueError(
+                "Used --should_continue but no checkpoint was found in --output_dir.")
         else:
             args.model_name_or_path = sorted_checkpoints[-1]
 
@@ -543,8 +545,10 @@ def main(df_trn, df_val):
     # Set seed
     set_seed(args)
 
-    config = AutoConfig.from_pretrained(args.config_name, cache_dir=args.cache_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name, cache_dir=args.cache_dir)
+    config = AutoConfig.from_pretrained(
+        args.config_name, cache_dir=args.cache_dir)
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.tokenizer_name, cache_dir=args.cache_dir)
     model = AutoModelWithLMHead.from_pretrained(
         args.model_name_or_path,
         from_tf=False,
@@ -557,10 +561,12 @@ def main(df_trn, df_val):
 
     # Training
     if args.do_train:
-        train_dataset = load_and_cache_examples(args, tokenizer, df_trn, df_val, evaluate=False)
+        train_dataset = load_and_cache_examples(
+            args, tokenizer, df_trn, df_val, evaluate=False)
 
         global_step, tr_loss = train(args, train_dataset, model, tokenizer)
-        logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
+        logger.info(" global_step = %s, average loss = %s",
+                    global_step, tr_loss)
 
     # Saving best-practices: if you use save_pretrained for the model and tokenizer, you can reload them using from_pretrained()
     if args.do_train:
@@ -592,19 +598,25 @@ def main(df_trn, df_val):
             checkpoints = list(
                 os.path.dirname(c) for c in sorted(glob.glob(args.output_dir + "/**/" + WEIGHTS_NAME, recursive=True))
             )
-            logging.getLogger("transformers.modeling_utils").setLevel(logging.WARN)  # Reduce logging
+            logging.getLogger("transformers.modeling_utils").setLevel(
+                logging.WARN)  # Reduce logging
         logger.info("Evaluate the following checkpoints: %s", checkpoints)
         for checkpoint in checkpoints:
-            global_step = checkpoint.split("-")[-1] if len(checkpoints) > 1 else ""
-            prefix = checkpoint.split("/")[-1] if checkpoint.find("checkpoint") != -1 else ""
+            global_step = checkpoint.split(
+                "-")[-1] if len(checkpoints) > 1 else ""
+            prefix = checkpoint.split(
+                "/")[-1] if checkpoint.find("checkpoint") != -1 else ""
 
             model = AutoModelWithLMHead.from_pretrained(checkpoint)
             model.to(args.device)
-            result = evaluate(args, model, tokenizer, df_trn, df_val, prefix=prefix)
-            result = dict((k + "_{}".format(global_step), v) for k, v in result.items())
+            result = evaluate(args, model, tokenizer,
+                              df_trn, df_val, prefix=prefix)
+            result = dict((k + "_{}".format(global_step), v)
+                          for k, v in result.items())
             results.update(result)
 
     return results
+
 
 if __name__ == "__main__":
     main(trn_df, val_df)
