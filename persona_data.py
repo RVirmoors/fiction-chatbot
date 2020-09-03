@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(
 )  # show docstring from top
 
 parser.add_argument(
-    '--files', type=int, default=2,
+    '--files', type=int, default=3,
     help='# of text files to process.')
 args = parser.parse_args()
 

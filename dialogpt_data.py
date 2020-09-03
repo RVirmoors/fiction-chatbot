@@ -21,8 +21,13 @@ parser = argparse.ArgumentParser(
 )  # show docstring from top
 
 parser.add_argument(
-    '--files', type=int, default=2,
+    '--files', type=int, default=3,
     help='# of text files to process.')
+
+parser.add_argument(
+    '--lines', type=int, default=6,
+    help='# of sentences per row.')
+
 args = parser.parse_args()
 
 
@@ -94,9 +99,9 @@ def read_and_parse(textfile):
                 # end of paragraph:
                 sentences.append(current)
 
-        for i in range(12, len(sentences)):
+        for i in range(args.lines, len(sentences)):
             data_line = [preprocess(sentences[j])
-                         for j in range(i, i - 12, -1)]
+                         for j in range(i, i - args.lines, -1)]
             data_lines.append(data_line)
     return data_lines
 
@@ -112,5 +117,5 @@ if __name__ == "__main__":
     for i in range(args.files):
         data = read_and_parse('text' + str(i + 1) + '.txt')
         print("Extracted lines from text", i + 1)
-        dataset.append(data)
-    write_dialog(dataset[0], 'dialog_data.json')
+        dataset += data
+    write_dialog(dataset, 'dialog_data.json')
