@@ -98,8 +98,8 @@ def jsonl_to_dataframe(file):
     df = pd.read_json(file, orient='values', encoding='utf-8')
     df.columns = [
         'response', 'context', 'context/0', 'context/1',
-        'context/2', 'context/3', 'context/4', 'context/5',
-        'context/6', 'context/7', 'context/8', 'context/9'
+        'context/2', 'context/3'#, 'context/4', 'context/5',
+        #'context/6', 'context/7', 'context/8', 'context/9'
     ]
     return df
 
