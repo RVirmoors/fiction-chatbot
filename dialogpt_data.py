@@ -84,7 +84,7 @@ def read_and_parse(textfile):
                         if cont_narr:
                             sentences[-1] += current
                             cont_narr = False
-                        elif current[0].lower() not in "said":
+                        elif current[0].lower() not in "saidsays":
 #                            print("QO:", current[0])
                             sentences.append(current)
                             cont_narr = False
@@ -95,13 +95,13 @@ def read_and_parse(textfile):
                 if current and not quotes and len(current) > 3:
                     # regular text, outside quotes
                     if current[-1] in ".!?":
-                        if current[0].lower() not in "said":
+                        if current[0].lower() not in "saidsays":
 #                            print("RT:", current[0])
                             sentences.append(current)
                         current = []
             if current and current[-1] in ".!?" and len(current) > 3:
                 # end of paragraph:
-                if current[0].lower() not in "said":
+                if current[0].lower() not in "saidsays":
 #                    print("EP:", current[0])
                     sentences.append(current)
                 current = []

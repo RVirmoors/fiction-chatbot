@@ -16,11 +16,12 @@ from transformers import (
 tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-small')
 model = AutoModelWithLMHead.from_pretrained('output-small')
 
-print("Enter 'Bye' to quit.")
+print("Say 'Bye' to quit.")
 
-userInput = input(">> You:")
+userInput = input(">> You: ")
+step = 0
 
-while userInput.lower() is not 'bye':
+while userInput.lower() not in 'bye':
     # encode the new user input, add the eos_token and return a tensor in Pytorch
     new_user_input_ids = tokenizer.encode(
         userInput + tokenizer.eos_token, return_tensors='pt')
@@ -45,4 +46,7 @@ while userInput.lower() is not 'bye':
     print("Bot: {}".format(tokenizer.decode(
         chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
 
-    userInput = input(">> You:")
+    userInput = input(">> You: ")
+#    step += 1
+
+print("Bot: Bye!")
