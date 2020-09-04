@@ -80,7 +80,7 @@ torchvision==0.6.1+cpu
 tqdm==4.41.1
 transformers==2.6.0
 urllib3==1.25.10
-uvicorn==0.11.1
+uvicorn==0.11.7
 wasabi==0.7.1
 websockets==8.1
 Werkzeug==1.0.1
