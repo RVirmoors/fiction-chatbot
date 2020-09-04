@@ -73,9 +73,10 @@ def read_and_parse(textfile):
                     elif len(current) > 2 and current[-1] in ".!?":
                         sentences.append(cont_diag + current)
                         cont_diag = []
-                    elif sentences and not cont_diag:   # short quote = narrative
-                        sentences[-1] += current
-                        cont_narr = True
+ #                   elif sentences and not cont_diag:   # short quote = narrative
+                        #                        sentences[-1] += current
+                        #                        print(sentences[-1])
+                        #                        cont_narr = True
                     current = []
                 elif quote_open in word:
                     quotes.append(quote_open)     # starting quote
@@ -83,25 +84,34 @@ def read_and_parse(textfile):
                         if cont_narr:
                             sentences[-1] += current
                             cont_narr = False
-                        else:
+                        elif current[0].lower() not in "said":
+#                            print("QO:", current[0])
                             sentences.append(current)
                             cont_narr = False
                     current = []
                 else:
                     current.append(word)
                 counter += 1
-                if current and not quotes:
+                if current and not quotes and len(current) > 3:
                     # regular text, outside quotes
                     if current[-1] in ".!?":
-                        sentences.append(current)
+                        if current[0].lower() not in "said":
+#                            print("RT:", current[0])
+                            sentences.append(current)
                         current = []
-            if current and current[-1] in ".!?":
+            if current and current[-1] in ".!?" and len(current) > 3:
                 # end of paragraph:
-                sentences.append(current)
+                if current[0].lower() not in "said":
+#                    print("EP:", current[0])
+                    sentences.append(current)
+                current = []
 
-        for i in range(args.lines, len(sentences)):
-            data_line = [preprocess(sentences[j])
-                         for j in range(i, i - args.lines, -1)]
+        for i in range(len(sentences) - 1):
+            data_line = ['', '', '', '', '', '']
+            data_line[0] = preprocess(sentences[i + 1])     # response
+            data_line[1] = preprocess(sentences[i])         # context
+            data_line[2:args.lines] = [preprocess(sentences[j])  # four other random lines
+                                       for j in random.sample(range(len(sentences)), args.lines - 2)]
             data_lines.append(data_line)
     return data_lines
 

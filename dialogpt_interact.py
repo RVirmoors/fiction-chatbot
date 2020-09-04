@@ -16,11 +16,14 @@ from transformers import (
 tokenizer = AutoTokenizer.from_pretrained('microsoft/DialoGPT-small')
 model = AutoModelWithLMHead.from_pretrained('output-small')
 
-# Let's chat for 5 lines
-for step in range(5):
+print("Enter 'Bye' to quit.")
+
+userInput = input(">> You:")
+
+while userInput.lower() is not 'bye':
     # encode the new user input, add the eos_token and return a tensor in Pytorch
     new_user_input_ids = tokenizer.encode(
-        input(">> User:") + tokenizer.eos_token, return_tensors='pt')
+        userInput + tokenizer.eos_token, return_tensors='pt')
     # print(new_user_input_ids)
 
     # append the new user input tokens to the chat history
@@ -39,5 +42,7 @@ for step in range(5):
     )
 
     # pretty print last ouput tokens from bot
-    print("RickBot: {}".format(tokenizer.decode(
+    print("Bot: {}".format(tokenizer.decode(
         chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+
+    userInput = input(">> You:")

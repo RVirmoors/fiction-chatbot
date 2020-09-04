@@ -12,6 +12,8 @@ transfer-learning-conv-ai/.DS_Store
 transfer-learning-conv-ai/gpt_personachat_cache_v2/
 *dataset_cache*
 
+output-small/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
