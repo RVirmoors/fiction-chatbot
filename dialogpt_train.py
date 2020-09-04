@@ -63,7 +63,7 @@ class Args():
         self.cache_dir = 'cached'
         self.block_size = 512
         self.do_train = True
-        self.do_eval = True
+        self.do_eval = False
         self.evaluate_during_training = False
         self.per_gpu_train_batch_size = 2
         self.per_gpu_eval_batch_size = 2
@@ -72,7 +72,7 @@ class Args():
         self.weight_decay = 0.0
         self.adam_epsilon = 1e-8
         self.max_grad_norm = 1.0
-        self.num_train_epochs = 2
+        self.num_train_epochs = 3
         self.max_steps = -1
         self.warmup_steps = 0
         self.logging_steps = 1000
