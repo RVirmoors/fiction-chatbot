@@ -72,11 +72,11 @@ class Args():
         self.weight_decay = 0.0
         self.adam_epsilon = 1e-8
         self.max_grad_norm = 1.0
-        self.num_train_epochs = 3
+        self.num_train_epochs = 2
         self.max_steps = -1
         self.warmup_steps = 0
         self.logging_steps = 1000
-        self.save_steps = 3500
+        self.save_steps = 5000
         self.save_total_limit = None
         self.eval_all_checkpoints = False
         self.no_cuda = False
@@ -98,7 +98,7 @@ def jsonl_to_dataframe(file):
     df = pd.read_json(file, orient='values', encoding='utf-8')
     df.columns = [
         'response', 'context', 'context/0', 'context/1',
-        'context/2', 'context/3'#, 'context/4', 'context/5',
+        'context/2', 'context/3'  # , 'context/4', 'context/5',
         #'context/6', 'context/7', 'context/8', 'context/9'
     ]
     return df
@@ -409,7 +409,7 @@ def train(args, train_dataset, model: PreTrainedModel, tokenizer: PreTrainedToke
                     model_to_save.save_pretrained(output_dir)
                     tokenizer.save_pretrained(output_dir)
 
-                    #torch.save(args, os.path.join(
+                    # torch.save(args, os.path.join(
                     #    output_dir, "training_args.bin"))
                     logger.info("Saving model checkpoint to %s", output_dir)
 
