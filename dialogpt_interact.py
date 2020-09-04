@@ -21,7 +21,7 @@ print("Say 'Bye' to quit.")
 userInput = input(">> You: ")
 step = 0
 
-while userInput.lower() not in 'bye':
+while userInput.lower() != 'bye':
     # encode the new user input, add the eos_token and return a tensor in Pytorch
     new_user_input_ids = tokenizer.encode(
         userInput + tokenizer.eos_token, return_tensors='pt')
