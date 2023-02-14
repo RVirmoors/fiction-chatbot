@@ -68,7 +68,7 @@ sentencepiece==0.1.91
 six==1.15.0
 spacy==2.2.3
 srsly==1.0.2
-starlette==0.12.9
+starlette==0.25.0
 tensorboard==1.15.0
 tensorflow==1.15.2
 tensorflow-estimator==1.15.1
